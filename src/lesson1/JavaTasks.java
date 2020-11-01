@@ -2,6 +2,7 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.beans.IntrospectionException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -79,7 +80,7 @@ public class JavaTasks {
                      = new BufferedReader(new InputStreamReader(new FileInputStream(inputName),
                 StandardCharsets.UTF_8));
              FileWriter writer = new FileWriter(new File(outputName), StandardCharsets.UTF_8)) {
-            TreeMap<String, TreeSet<String>> addressOfPeople =
+            Map<String, TreeSet<String>> addressOfPeople =
                     new TreeMap<>((o1, o2) -> {
                         String[] O1 = o1.split("\\s");
                         String[] O2 = o2.split("\\s");
@@ -105,7 +106,7 @@ public class JavaTasks {
                 writer.write(string.toString());
             }
         } catch (IOException e) {
-            throw new NotImplementedError();
+            throw new IllegalArgumentException();
         }
     }
 
@@ -195,7 +196,7 @@ public class JavaTasks {
      * 2
      * 2
      * ----------
-     * Трудоемкость O(nlog(n))
+     * Трудоемкость O(n)
      * Ресурсоемкость O(n)
      * ----------
      */
@@ -203,28 +204,19 @@ public class JavaTasks {
         try (BufferedReader reader = new BufferedReader(new FileReader(inputName));
              FileWriter writer = new FileWriter(outputName)) {
             String number;
-            List<Integer> init = new ArrayList<>(), sorted = new ArrayList<>();
+            List<Integer> init = new ArrayList<>();
+            Map <Integer, Integer> map = new TreeMap<>();
             while ((number = reader.readLine()) != null) {
                 init.add(Integer.parseInt(number));
-                sorted.add(Integer.parseInt(number));
+                int count = map.getOrDefault(Integer.parseInt(number), 0);
+                count++;
+                map.put(Integer.parseInt(number), count);
             }
-            Collections.sort(sorted);
-            int maxCount = 0, lastNum, i = 0, maxNum = 0;
-            while (i < sorted.size()) {
-                lastNum = sorted.get(i);
-                i++;
-                int currentCount = 1;
-                while (i < sorted.size() && sorted.get(i) == lastNum) {
-                    currentCount++;
-                    lastNum = sorted.get(i);
-                    i++;
-                }
-                if (currentCount > maxCount) {
-                    maxCount = currentCount;
-                    maxNum = lastNum;
-                } else if (currentCount == maxCount) {
-                    if (lastNum < maxNum)
-                        maxNum = lastNum;
+            int maxNum = 0, maxCount = 0;
+            for(Entry <Integer, Integer> entry : map.entrySet()){
+                if(entry.getValue() > maxCount || (entry.getValue() == maxCount && entry.getKey() < maxNum)){
+                    maxCount = entry.getValue();
+                    maxNum = entry.getKey();
                 }
             }
             for (Integer integer : init) {
