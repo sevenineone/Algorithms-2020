@@ -165,7 +165,7 @@ abstract class AbstractBinarySearchTreeTest {
         //////////////////////////
         val controlSet = mutableSetOf<Int>()
         controlSet.addAll(arrayOf(1, 5, 57, 7878, 78, 777))
-        var toRemove = 78
+        val toRemove = 78
         println("Initial set: $controlSet")
         val binarySet = create()
         for (element in controlSet) {
@@ -358,7 +358,7 @@ abstract class AbstractBinarySearchTreeTest {
 
         val controlSet = TreeSet<Int>()
 
-        var toRemove = 789
+        val toRemove = 789
         controlSet.addAll(arrayOf(1, 4354, 789, 567565, 5675467, 4645))
         println("Initial set: $controlSet")
         val binarySet = create()
