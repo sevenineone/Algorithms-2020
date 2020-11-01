@@ -104,54 +104,49 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      * ----------
      */
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(Object o) { // finding and deleting a removable node
         T t = (T) o;
         Node<T> removable = find(t);
         if (removable == null || removable.value != t) return false;
+        else {
+            removeNode(removable);
+            return true;
+        }
+    }
+
+    private void removeNode(Node<T> removable) { // removing a removable node
         if (removable.right != null && removable.left != null) {
             Node<T> min = removable.right;
             while (min.left != null) min = min.left;
             if (min.parent != removable) {
-                if (min.parent == null) root = min.right;
-                else if (min.parent.left == min) {
-                    min.parent.left = min.right;
-                } else {
-                    min.parent.right = min.right;
-                }
+                swap(min, min.right);
                 if (min.right != null)
                     min.parent = min.right.parent;
                 min.right = removable.right;
                 min.right.parent = min;
             }
-            if (removable.parent == null) root = min;
-            else if (removable.parent.left == removable) {
-                removable.parent.left = min;
-            } else {
-                removable.parent.right = min;
-            }
+            swap(removable, min);
             removable.parent = min.parent;
             min.left = removable.left;
             min.left.parent = min;
         } else if (removable.left == null) {
-            if (removable.parent == null) root = removable.right;
-            else if (removable.parent.left == removable) {
-                removable.parent.left = removable.right;
-            } else {
-                removable.parent.right = removable.right;
-            }
+            swap(removable, removable.right);
             if (removable.right != null)
                 removable.parent = removable.right.parent;
         } else {
-            if (removable.parent == null) root = removable.left;
-            else if (removable.parent.left == removable) {
-                removable.parent.left = removable.left;
-            } else {
-                removable.parent.right = removable.left;
-            }
+            swap(removable, removable.left);
             removable.parent = removable.left.parent;
         }
         size--;
-        return true;
+    }
+
+    private void swap(Node<T> first, Node<T> second){ // swapping to elements
+        if (first.parent == null) root = second;
+        else if (first.parent.left == first) {
+            first.parent.left = second;
+        } else {
+            first.parent.right = second;
+        }
     }
 
 
@@ -249,8 +244,8 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          */
         @Override
         public void remove() {
-            if(current == null) throw new IllegalStateException();
-            BinarySearchTree.this.remove(current.value);
+            if (current == null) throw new IllegalStateException();
+            BinarySearchTree.this.removeNode(current);
             current = null;
         }
     }
