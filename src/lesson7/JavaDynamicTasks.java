@@ -22,6 +22,10 @@ public class JavaDynamicTasks {
      * Если общей подпоследовательности нет, вернуть пустую строку.
      * Если есть несколько самых длинных общих подпоследовательностей, вернуть любую из них.
      * При сравнении подстрок, регистр символов *имеет* значение.
+     * ----------
+     * Трудоемкость O(first.length() * second.length())
+     * Ресурсоемкость O(first.length() * second.length())
+     * ----------
      */
     public static String longestCommonSubSequence(String first, String second) {
         int n = first.length() + 1, m = second.length() + 1, i, j;
@@ -59,9 +63,34 @@ public class JavaDynamicTasks {
      * Если самых длинных возрастающих подпоследовательностей несколько (как в примере),
      * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
+     * ----------
+     * Трудоемкость O(nlog(n))
+     * Ресурсоемкость O(n)
+     * ----------
      */
     public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        throw new NotImplementedError();
+        int[] prev = new int[list.size()];
+        int[] m = new int[list.size() + 1];
+        int max = 0;
+        for (int i = list.size() - 1; i >= 0; i--) {
+            int lo = 1, hi = max;
+            while(lo <= hi){
+                int mid = (int) Math.ceil((lo + hi) >> 1);
+                if(list.get(m[mid]) > list.get(i)) lo = mid + 1;
+                else hi = mid - 1;
+            }
+            int l = lo;
+            prev[i] = m[l - 1];
+            m[l] = i;
+            if (l > max) max = l;
+        }
+        ArrayList<Integer> ans = new ArrayList<>();
+        int j = m[max];
+        for (int i = max - 1; i >= 0; i--) {
+            ans.add(list.get(j));
+            j = prev[j];
+        }
+        return ans;
     }
 
     /**
@@ -83,6 +112,10 @@ public class JavaDynamicTasks {
      * Необходимо найти маршрут с минимальным весом и вернуть этот минимальный вес.
      * <p>
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
+     * ----------
+     * Трудоемкость O(n*m)
+     * Ресурсоемкость O(n*m)
+     * ----------
      */
     public static int shortestPathOnField(String inputName) throws IOException { // remember idea to use A*
         try (BufferedReader reader = new BufferedReader(new FileReader(inputName))) {
