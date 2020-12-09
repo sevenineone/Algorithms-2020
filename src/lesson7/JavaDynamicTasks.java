@@ -2,9 +2,12 @@ package lesson7;
 
 import kotlin.NotImplementedError;
 
-import java.util.List;
+
+import java.io.*;
+import java.util.*;
 
 import static java.lang.Math.max;
+
 
 @SuppressWarnings("unused")
 public class JavaDynamicTasks {
@@ -23,7 +26,7 @@ public class JavaDynamicTasks {
     public static String longestCommonSubSequence(String first, String second) {
         int n = first.length() + 1, m = second.length() + 1, i, j;
         int[][] matrix = new int[n][m];
-        StringBuilder ans = new StringBuilder("");
+        StringBuilder ans = new StringBuilder();
         for (i = 1; i < n; i++) {
             for (j = 1; j < m; j++) {
                 if (first.charAt(i - 1) == second.charAt(j - 1))
@@ -81,9 +84,71 @@ public class JavaDynamicTasks {
      * <p>
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
      */
-    public static int shortestPathOnField(String inputName) { // remember idea to use A*
-        throw new NotImplementedError();
+    public static int shortestPathOnField(String inputName) throws IOException { // remember idea to use A*
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputName))) {
+            ArrayList<String> matrix = new ArrayList<>();
+            Set<Node> closed = new HashSet<>();
+            while (reader.ready()) matrix.add(reader.readLine().replaceAll(" ", ""));
+            Queue<Node> open = new PriorityQueue<>(Comparator.comparing(Node::getF));
+            Pair<Integer, Integer> startPosition = new Pair<>(0, 0);
+            Pair<Integer, Integer> targetPosition = new Pair<>(matrix.get(0).length() - 1, matrix.size() - 1);
+            if (startPosition == targetPosition) return 0;
+            Node startNode = new Node(0, startPosition, targetPosition, null);
+            closed.add(startNode);
+            open.addAll(getNeighbours(startNode, matrix, closed));
+            while (!open.isEmpty()) {
+                Node nodeToCheck = open.poll();
+                if (nodeToCheck.getPosition().getFirst().equals(targetPosition.getFirst()) &&
+                        nodeToCheck.getPosition().getSecond().equals(targetPosition.getSecond())) {
+                    return nodeToCheck.getG();
+                }
+                closed.add(nodeToCheck);
+                for (Node v : getNeighbours(nodeToCheck, matrix, closed)) {
+                    if (!containsNode(closed, v)) {
+                        open.add(v);
+                    }
+                }
+            }
+            return 0;
+        }
     }
+
+    private static Boolean containsNode(Set<Node> closed, Node node){
+        for(Node v : closed){
+            if (node.getPosition().getFirst().equals(v.getPosition().getFirst()) &&
+                    node.getPosition().getSecond().equals(v.getPosition().getSecond())
+            && node.getF() == node.getF()) return true;
+        }
+        return false;
+    }
+
+    public static List<Node> getNeighbours(Node node, ArrayList<String> matrix, Set<Node> closed) {
+        List<Node> neighbours = new ArrayList<>();
+        int x, y;
+        int X = matrix.get(0).length(), Y = matrix.size();
+        Node addable;
+        x = node.getPosition().getFirst();
+        y = node.getPosition().getSecond();
+        if (x + 1 < X)
+            neighbours.add(new Node(node.getG() + (matrix.get(y).charAt(x + 1) - '0'), new Pair<>(
+                    x + 1, y),
+                    node.getFinish(),
+                    node));
+        if (x + 1 < X && y + 1 < Y) {
+            addable = new Node(node.getG() + (matrix.get(y + 1).charAt(x + 1) - '0'), new Pair<>(
+                    x + 1, y + 1),
+                    node.getFinish(),
+                    node);
+                neighbours.add(addable);
+        }
+        if (y + 1 < Y)
+            neighbours.add(new Node(node.getG() + (matrix.get(y + 1).charAt(x) - '0'), new Pair<>(
+                    x, y + 1),
+                    node.getFinish(),
+                    node));
+        return neighbours;
+    }
+
 
     // Задачу "Максимальное независимое множество вершин в графе без циклов"
     // смотрите в уроке 5
