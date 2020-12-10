@@ -351,6 +351,27 @@ abstract class AbstractGraphTests {
         }.build()
         val longestPath3 = graph3.longestSimplePath()
         assertEquals(6, longestPath3.length)
+        //////--MY-TEST--/////////////
+        /*
+            A--B--C
+                \ | \
+                  D--E
+         */
+        val myGraph = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            addConnection(a, b)
+            addConnection(b, c)
+            addConnection(c, d)
+            addConnection(d, b)
+            addConnection(d, e)
+            addConnection(e, c)
+        }.build()
+        val myLongestPath = myGraph.longestSimplePath()
+        assertEquals(4, myLongestPath.length)
     }
 
     fun baldaSearcher(baldaSearcher: (String, Set<String>) -> Set<String>) {
